@@ -29,6 +29,7 @@ namespace TurboAzDB.Models.DataContexts
                 .HasOne<Brand>()
                 .WithMany()
                 .HasForeignKey(a => a.BrandId)
+                .HasPrincipalKey(a => a.Id)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // one-to-many Announcement and Model
@@ -36,6 +37,7 @@ namespace TurboAzDB.Models.DataContexts
                 .HasOne<Model>()
                 .WithMany()
                 .HasForeignKey(a => a.ModelId)
+                .HasPrincipalKey(a => a.Id)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // one-to-many Model and Brand
@@ -43,6 +45,7 @@ namespace TurboAzDB.Models.DataContexts
                 .HasOne<Brand>()
                 .WithMany()
                 .HasForeignKey(m => m.BrandId)
+                .HasPrincipalKey(a => a.Id)
                 .OnDelete(DeleteBehavior.NoAction);
 
         }

@@ -5,22 +5,22 @@ namespace TurboAzDB.Models.Entities
     public class Announcement
     {
         public int Id { get; private set; }
-        public int Price { get; private set; }
-        public int Year { get; private set; }
-        public decimal Mileage { get; private set; }
-        public int BrandId { get; private set; }
-        public int ModelId { get; private set; }
-        public FuelType FuelType { get; private set; }
-        public SpeedBox SpeedBox { get; private set; }
-        public BanType BanType { get; private set; }
-        public Transmitter Transmitter { get; private set; }
+        public int Price { get; set; }
+        public int Year { get; set; }
+        public decimal Mileage { get; set; }
+        public int BrandId { get; set; }
+        public int ModelId { get; set; }
+        public FuelType FuelType { get; set; }
+        public SpeedBox SpeedBox { get; set; }
+        public BanType BanType { get; set; }
+        public Transmitter Transmitter { get; set; }
 
-        public int CreatedBy { get; set; }
+        public int CreatedBy { get; set; } = 1;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public int LastModifiedBy { get; set; }
-        public DateTime LastModifiedAt { get; set; }
-        public int DeletedBy { get; set; }
-        public DateTime DeletedAt { get; set; }
+        public int? LastModifiedBy { get; set; }
+        public DateTime? LastModifiedAt { get; set; }
+        public int? DeletedBy { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public Announcement(int price, int year, decimal mileage, int brandId, int modelId, FuelType fuelType, SpeedBox speedBox, BanType banType, Transmitter transmitter)
         {

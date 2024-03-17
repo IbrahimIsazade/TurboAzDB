@@ -1,25 +1,29 @@
 ﻿namespace TurboAzDB.Models.Stable
 {
-    internal enum MenuOption : byte
+    public enum MenuOption : byte
     {
         //Brand
         AddBrand = 1,
-        DeleteBrand, // Not finished
-        EditBrand,
+        DeleteBrand,
+        UpdateBrand,
         GetAllBrands,
+        GetBrandById,
 
         //Model
         AddModel,
-        DeleteModel,// Not finished
-        EditModel,
+        DeleteModel,
+        UpdateModel,
         GetAllModels,
         GetModelById,
 
         // Announcement
         AddAnnouncement,
-        DeleteAnnouncement,// Not finished
-        EditAnnouncement,// Not finished
+        DeleteAnnouncement,
+        UpdateAnnouncement,
         GetAllAnnouncements,
         GetAnnouncementById,
+
+        // Save Changes
+        SaveChanges
     }
 }

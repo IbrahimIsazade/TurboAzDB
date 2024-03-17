@@ -1,4 +1,7 @@
-﻿using TurboAzDB.Models.Stable;
+﻿using Microsoft.EntityFrameworkCore;
+using TurboAzDB.Models.DataContexts;
+using TurboAzDB.Models.Entities;
+using TurboAzDB.Models.Stable;
 namespace TurboAzDB.Extensions
 {
     public static partial class Extension
@@ -80,6 +83,90 @@ namespace TurboAzDB.Extensions
             }
 
             return (T)enumValue;
+        }
+
+        public static int GetIdFromList(TurboAzDbContext db,IQueryable<Brand> values, string? caption = null)
+        {
+            if (string.IsNullOrWhiteSpace(caption))
+                caption = "Choose from list";
+
+            var backupColor = Console.ForegroundColor;
+            Console.WriteLine("============== CHOOSE BRAND =============");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var item in values)
+            {
+                var orderNo = item.Id;
+
+                Console.WriteLine($"{item.Id}. {item.Name}");
+            }
+            Console.ForegroundColor = backupColor;
+            Console.WriteLine("==========================================");
+
+            getId:
+            int userSelectId = Read<int>("Enter an Id of a brand: ");
+
+            if (userSelectId < 0 || db.Brands.Any(b => b.Id == userSelectId) == false)
+            {
+                Console.WriteLine("Wrong Id. Please rewrite");
+                goto getId;
+            }
+            return userSelectId;
+        }
+
+        public static int GetIdFromList(TurboAzDbContext db,IQueryable<Model> values, string? caption = null)
+        {
+            if (string.IsNullOrWhiteSpace(caption))
+                caption = "Choose from list";
+
+            var backupColor = Console.ForegroundColor;
+            Console.WriteLine("============== CHOOSE MODEL =============");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var item in values)
+            {
+                var orderNo = item.Id;
+
+                Console.WriteLine($"{item.Id}. {item.Name}");
+            }
+            Console.ForegroundColor = backupColor;
+            Console.WriteLine("==========================================");
+
+            getId:
+            int userSelectId = Read<int>("Enter an Id of a model: ");
+
+            if (userSelectId < 0 || db.Models.Any(m => m.Id == userSelectId) == false)
+            {
+                Console.WriteLine("Wrong Id. Please rewrite");
+                goto getId;
+            }
+            return userSelectId;
+        }
+
+        public static int GetIdFromList(TurboAzDbContext db,IQueryable<Announcement> values, string? caption = null)
+        {
+            if (string.IsNullOrWhiteSpace(caption))
+                caption = "Choose from list";
+
+            var backupColor = Console.ForegroundColor;
+            Console.WriteLine("============== CHOOSE ANNOUNCEMENT =============");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var item in values)
+            {
+                var orderNo = item.Id;
+
+                Console.WriteLine(item);
+            }
+            Console.ForegroundColor = backupColor;
+            Console.WriteLine("==========================================");
+
+            getId:
+            int userSelectId = Read<int>("Enter an Id of a model: ");
+
+            if (userSelectId < 0 || db.Announcements.Any(m => m.Id == userSelectId) == false)
+            {
+                Console.WriteLine("Wrong Id. Please rewrite");
+                goto getId;
+            }
+            return userSelectId;
         }
     }
 }
