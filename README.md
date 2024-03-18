@@ -1,4 +1,4 @@
-# Turbo.Az bun in C#
+# Turbo.Az but in C#
 ___
 ## What do I used in this project:
 ### NuGet extensions:
