@@ -1,5 +1,4 @@
 ﻿using TurboAzDB.Extensions;
-using TurboAzDB.Migrations;
 using TurboAzDB.Models.DataContexts;
 using TurboAzDB.Models.Entities;
 using TurboAzDB.Models.Stable;
@@ -10,10 +9,10 @@ namespace TurboAzDB
     internal class Program
     {
         static TurboAzDbContext db = new TurboAzDbContext();
+        static ConsoleColor backupColor = Console.ForegroundColor;
+        static bool changesSaved = true;
         static void Main()
         {
-            bool changesSaved = true;
-            var backupColor = Console.ForegroundColor;
         l1:
             if (!changesSaved)
             {
@@ -33,12 +32,10 @@ namespace TurboAzDB
                     goto l1;
                 case MenuOption.DeleteBrand:
                     DeleteBrand();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.UpdateBrand:
                     UpdateBrand();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.GetAllBrands:
@@ -59,12 +56,10 @@ namespace TurboAzDB
                     goto l1;
                 case MenuOption.DeleteModel:
                     DeleteModel();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.UpdateModel:
                     UpdateModel();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.GetAllModels:
@@ -72,8 +67,7 @@ namespace TurboAzDB
                     GetAllModels();
                     goto l1;
                 case MenuOption.GetModelById:
-
-                    changesSaved = false;
+                    GetModelById();
                     Console.Clear();
                     goto l1;
 
@@ -86,12 +80,10 @@ namespace TurboAzDB
                     goto l1;
                 case MenuOption.DeleteAnnouncement:
                     DeleteAnnouncemet();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.UpdateAnnouncement:
                     UpdateAnnouncemet();
-                    changesSaved = false;
                     Console.Clear();
                     goto l1;
                 case MenuOption.GetAllAnnouncements:
@@ -99,8 +91,7 @@ namespace TurboAzDB
                     GetAllAnnouncemets();
                     goto l1;
                 case MenuOption.GetAnnouncementById:
-
-                    changesSaved = false;
+                    GetAnnouncementById();
                     Console.Clear();
                     goto l1;
                 default:
@@ -126,30 +117,54 @@ namespace TurboAzDB
         static public void UpdateBrand()
         {
             int id = Extension.GetIdFromList(db, db.Brands);
-            Brand brand = db.Brands.FirstOrDefault(b => b.Id == id)!;
-            if (brand != null)
-            {
-                brand.Name = Extension.ReadString("Enter new name of the brand: ");
-                brand.LastModifiedAt = DateTime.Now;
-                brand.LastModifiedBy = 1;
 
-                db.Brands.Update(brand);
+            if (ConfirmAction("update", "brand") == true)
+            {
+                Brand brand = db.Brands.FirstOrDefault(b => b.Id == id)!;
+                if (brand != null)
+                {
+                    brand.Name = Extension.ReadString("Enter new name of the brand: ");
+                    brand.LastModifiedAt = DateTime.Now;
+                    brand.LastModifiedBy = 1;
+
+                    db.Brands.Update(brand);
+                }
+                changesSaved = false;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ACTION WAS CANCELLED!");
+                Console.ForegroundColor = backupColor;
+                Thread.Sleep(2000);
             }
         }
 
         static public void DeleteBrand()
         {
             int id = Extension.GetIdFromList(db, db.Brands);
-            Brand brand = db.Brands.FirstOrDefault(b => b.Id == id)!;
-            if (brand != null)
+
+            if (ConfirmAction("delete", "brand") == true)
             {
-                brand.DeletedAt = DateTime.Now;
-                brand.DeletedBy = 1;
-                db.Brands.Update(brand);
+                Brand brand = db.Brands.FirstOrDefault(b => b.Id == id)!;
+                if (brand != null)
+                {
+                    brand.DeletedAt = DateTime.Now;
+                    brand.DeletedBy = 1;
+                    db.Brands.Update(brand);
+                }
+                else
+                {
+                    Console.WriteLine($"THERE'S NO ANY BRAND BY ID ${id}");
+                }
+                changesSaved = false;
             }
             else
             {
-                Console.WriteLine($"THERE'S NO ANY BRAND BY ID ${id}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ACTION WAS CANCELLED!");
+                Console.ForegroundColor = backupColor;
+                Thread.Sleep(2000);
             }
         }
 
@@ -191,38 +206,57 @@ namespace TurboAzDB
         static public void UpdateModel()
         {
             int brandId = Extension.GetIdFromList(db, db.Brands);
-            var rows = db.Models.Where(m => m.BrandId == brandId);
-
-            int modelId = Extension.GetIdFromList(db, rows);
-            Model model = db.Models.FirstOrDefault(m => m.Id == modelId)!;
-            if (model != null)
+            if (ConfirmAction("update", "model") == true)
             {
-                model.Name = Extension.ReadString("Enter new name of the model: ");
-                model.BrandId = Extension.GetIdFromList(db, db.Brands);
-                model.LastModifiedAt = DateTime.Now;
-                model.LastModifiedBy = 1;
+                var rows = db.Models.Where(m => m.BrandId == brandId);
 
-                db.Models.Update(model);
+                int modelId = Extension.GetIdFromList(db, rows);
+                Model model = db.Models.FirstOrDefault(m => m.Id == modelId)!;
+                if (model != null)
+                {
+                    model.Name = Extension.ReadString("Enter new name of the model: ");
+                    model.BrandId = Extension.GetIdFromList(db, db.Brands);
+                    model.LastModifiedAt = DateTime.Now;
+                    model.LastModifiedBy = 1;
+
+                    db.Models.Update(model);
+                }
+                changesSaved = false;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ACTION WAS CANCELLED!");
+                Console.ForegroundColor = backupColor;
+                Thread.Sleep(2000);
             }
         }
 
         static public void DeleteModel()
         {
             int brandId = Extension.GetIdFromList(db, db.Brands);
-            var rows = db.Models.Where(m => m.BrandId == brandId);
+            if (ConfirmAction("delete", "model") == true)
+            {
+                var rows = db.Models.Where(m => m.BrandId == brandId);
 
-            int modelId = Extension.GetIdFromList(db, rows);
-            Model model = db.Models.FirstOrDefault(m => m.Id == modelId)!;
-            model.DeletedAt = DateTime.Now;
-            model.DeletedBy = 1;
-            db.Models.Update(model);
+                int modelId = Extension.GetIdFromList(db, rows);
+                Model model = db.Models.FirstOrDefault(m => m.Id == modelId)!;
+                model.DeletedAt = DateTime.Now;
+                model.DeletedBy = 1;
+                db.Models.Update(model);
+                changesSaved = false;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ACTION WAS CANCELLED!");
+                Console.ForegroundColor = backupColor;
+                Thread.Sleep(2000);
+            }
         }
 
         static public void GetAllModels()
         {
-            //int id = Extension.GetIdFromList(db, db.Brands);
-            //var rows = db.Models.Where(m => m.BrandId == id);
-
             var query = (from m in db.Models
                          join b in db.Brands on m.BrandId equals b.Id
                          where m.DeletedAt == null && b.DeletedAt == null
@@ -299,24 +333,48 @@ namespace TurboAzDB
                 announcement.LastModifiedAt = DateTime.Now;
                 announcement.LastModifiedBy = 1;
 
-                db.Announcements.Update(announcement);
+                if (ConfirmAction("update", "announcement") == true)
+                {
+                    db.Announcements.Update(announcement);
+                    changesSaved = false;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("ACTION WAS CANCELLED!");
+                    Console.ForegroundColor = backupColor;
+                    Thread.Sleep(2000);
+                }
             }
         }
 
         static public void DeleteAnnouncemet()
         {
             int id = Extension.GetIdFromList(db, db.Announcements);
-            Announcement announcement = db.Announcements.FirstOrDefault(b => b.Id == id)!;
-            if (announcement != null)
+            if (ConfirmAction("delete", "announcement") == true)
             {
-                announcement.DeletedAt = DateTime.Now;
-                announcement.DeletedBy = 1;
-                db.Announcements.Update(announcement);
+                Announcement announcement = db.Announcements.FirstOrDefault(b => b.Id == id)!;
+                if (announcement != null)
+                {
+                    announcement.DeletedAt = DateTime.Now;
+                    announcement.DeletedBy = 1;
+                    db.Announcements.Update(announcement);
+                    changesSaved = false;
+
+                }
+                else
+                {
+                    Console.WriteLine($"THERE'S NO ANY ANNOUNCEMENT BY ID ${id}");
+                }
             }
             else
             {
-                Console.WriteLine($"THERE'S NO ANY ANNOUNCEMENT BY ID ${id}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ACTION WAS CANCELLED!");
+                Console.ForegroundColor = backupColor;
+                Thread.Sleep(2000);
             }
+            
         }
 
         static public void GetAllAnnouncemets()
@@ -325,14 +383,16 @@ namespace TurboAzDB
                          join m in db.Models on a.ModelId equals m.Id
                          join b in db.Brands on a.BrandId equals b.Id
                          where m.DeletedAt == null && b.DeletedAt == null && a.DeletedAt == null
-                         select new { a.DeletedAt, a.Id, a.Year, a.Mileage, a.FuelType, a.BanType, a.Transmitter, a.SpeedBox, modelName = m.Name, brandId = b.Id, brandName = b.Name }).ToList();
+                         select new { a.DeletedAt, a.Id, a.Year, a.ModelId, a.BrandId, a.Mileage, a.FuelType, a.BanType, a.Transmitter, a.SpeedBox, modelName = m.Name, brandId = b.Id, brandName = b.Name }).ToList();
 
             Console.WriteLine("===== Announcements =====");
             foreach (var item in query)
             {
                     Console.WriteLine($"---- Announcement {item.Id} ----\n" +
-                    $"Brand: {item.brandName}" +
-                    $"\nModel: {item.modelName}" +
+                    $"Brand Name: {item.brandName}" +
+                    $"\nBrand Id: {item.BrandId}" +
+                    $"\nModel Name: {item.modelName}" +
+                    $"\nModel Id: {item.ModelId}" +
                     $"\nYear: {item.Year}" +
                     $"\nMileage: {item.Mileage}" +
                     $"\nFuel type: {item.FuelType}" +
@@ -363,6 +423,13 @@ namespace TurboAzDB
                     $" Model Transmitter: {item.Transmitter},"
                     );
             Console.WriteLine("==================");
+        }
+
+        static public bool? ConfirmAction(string action, string category)
+        {
+            string answ = Extension.ReadString($"Are you sure that you want to {action} {category} (y/n): ");
+
+            return answ == "y" ? true : (answ == "n" ? false : null);
         }
     }
 }
