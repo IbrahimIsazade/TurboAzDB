@@ -113,8 +113,11 @@ namespace TurboAzDB
         //[ BRAND METHODS ]\\
         static public void AddBrand()
         {
-            Brand brand = new(Extension.ReadString("Enter the name of a new brand: "));
+        getName:
+            string name = Extension.ReadString("Enter the name of a new brand: ");
+            if (string.IsNullOrWhiteSpace(name)) { Console.WriteLine("Wrong brand name!"); goto getName; }
 
+            Brand brand = new(name);
             db.Brands.Add(brand);
         }
 
