@@ -22,6 +22,7 @@
         UpdateAnnouncement,
         GetAllAnnouncements,
         GetAnnouncementById,
+        GetAnnouncementByBrand,
 
         // Save Changes
         SaveChanges

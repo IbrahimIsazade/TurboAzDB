@@ -67,8 +67,8 @@ namespace TurboAzDB
                     GetAllModels();
                     goto l1;
                 case MenuOption.GetModelById:
-                    GetModelById();
                     Console.Clear();
+                    GetModelById();
                     goto l1;
 
 
@@ -91,8 +91,12 @@ namespace TurboAzDB
                     GetAllAnnouncemets();
                     goto l1;
                 case MenuOption.GetAnnouncementById:
-                    GetAnnouncementById();
                     Console.Clear();
+                    GetAnnouncementById();
+                    goto l1;
+                case MenuOption.GetAnnouncementByBrand:
+                    Console.Clear();
+                    GetAnnouncementByBrand();
                     goto l1;
                 default:
                     break;
@@ -425,6 +429,35 @@ namespace TurboAzDB
             Console.WriteLine("==================");
         }
 
+        static public void GetAnnouncementByBrand()
+        {
+            var id = Extension.GetIdFromList(db, db.Brands);
+
+            var query = (from a in db.Announcements
+                         join m in db.Models on a.ModelId equals m.Id
+                         join b in db.Brands on a.BrandId equals b.Id
+                         where m.DeletedAt == null && b.DeletedAt == null && a.DeletedAt == null && a.BrandId == id
+                         select new { a.DeletedAt, a.Id, a.Year, a.ModelId, a.BrandId, a.Mileage, a.FuelType, a.BanType, a.Transmitter, a.SpeedBox, modelName = m.Name, brandId = b.Id, brandName = b.Name }).ToList();
+
+            Console.WriteLine("===== Announcements =====");
+            foreach (var item in query)
+            {
+                Console.WriteLine($"---- Announcement {item.Id} ----\n" +
+                $"Brand Name: {item.brandName}" +
+                $"\nBrand Id: {item.BrandId}" +
+                $"\nModel Name: {item.modelName}" +
+                $"\nModel Id: {item.ModelId}" +
+                $"\nYear: {item.Year}" +
+                $"\nMileage: {item.Mileage}" +
+                $"\nFuel type: {item.FuelType}" +
+                $"\nSpeed box: {item.SpeedBox}" +
+                $"\nBan type: {item.BanType}" +
+                $"\nTransmitter: {item.Transmitter}\n----------");
+            }
+            Console.WriteLine("==================");
+        }
+
+        //[ OTHER ]\\
         static public bool? ConfirmAction(string action, string category)
         {
             string answ = Extension.ReadString($"Are you sure that you want to {action} {category} (y/n): ");
